@@ -24,20 +24,35 @@ class HTMLNode:
         return f"HTMLNode({self.tag}, {self.value}, children: {self.children}, {self.props})"
         
 class LeafNode(HTMLNode):
-    def __init__(self, tag: str | None = None, value:str | None = None,props: Dict[str,str] | None = None):
+    def __init__(self, tag, value,props: Dict[str,str] | None = None):
         if not value:
             raise ValueError("All leaf nodes require a value")
     
-        super().__init__(tag=tag,value=value,props=props)
+        super().__init__(tag=tag, value=value, children=None, props=props)
         
     def to_html(self):
         if self.tag == None:
-            return f"{self.value}"
-        elif self.tag == "p":
-            return f"<{self.tag}>{self.value}</{self.tag}>"
-        elif self.tag == "a":
-            for prop in self.props:
-                return f"<{self.tag} {prop}=\"{self.props[prop]}\">{self.value}</{self.tag}>"
+            return self.value
+        elif self.value is None:
+            raise ValueError("Invalid HTML: no value")
         else:
-            return ""
-            
+            return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
+    def __repr__(self):
+        return f"LeafNode({self.tag}, {self.value}, {self.props})"
+
+
+class ParentNode(HTMLNode):
+    def __init__(self, tag, children ,props: Dict[str,str] | None = None):
+        super().__init__(tag=tag, value=None, children=children, props=props)
+
+    def to_html(self):
+        if self.tag is None:
+            raise ValueError("Invalid HTML: no tag")
+        if self.children is None:
+            raise ValueError("Invalid HTML: no children")
+        children_html = ""
+        for child in self.children:
+            children_html += child.to_html()
+        return f"<{self.tag}{self.props_to_html()}>{children_html}</{self.tag}>"
+    def __repr__(self):
+        return f"ParentNode({self.tag}, children:{self.children}, {self.props})"
