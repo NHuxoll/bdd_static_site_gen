@@ -38,21 +38,4 @@ def text_node_to_html_node(text_node):
             return LeafNode("img", "",{"src": text_node.url, "alt": text_node.text})
         raise ValueError(f"Invalid text type: ")
 
-def split_nodes_delimiter(old_nodes, delimiter, text_type):
-    return_list = []
-    for o_node in old_nodes:
-        tmp = []
-        split = o_node.text.split(delimiter)
-        for index, split_node in enumerate(split):
-            if index % 2 == 0:
-                tmp.append(TextNode(split_node, text_type_text))
-            else:
-                if delimiter == "**":
-                    tmp.append(TextNode(split_node, text_type_bold))
-                if delimiter == "*":
-                    tmp.append(TextNode(split_node, text_type_italic))
-                if delimiter == "'":
-                    tmp.append(TextNode(split_node, text_type_code))
-        return_list.extend(tmp)
-    return return_list
 
