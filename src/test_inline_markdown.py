@@ -1,6 +1,8 @@
 import unittest
 from inline_markdown import (
-    split_nodes_delimiter
+    split_nodes_delimiter,
+    extract_markdown_images,
+    extract_markdown_links
 )
 
 from textnode import (
@@ -111,6 +113,40 @@ class TestInlineMarkdown(unittest.TestCase):
 
     def test_node_italic(self):
         pass
+    def test_single_image(self):
+        text = "This is an ![image](https://google.de/images/test.png)"
+        extracted_image = extract_markdown_images(text)
+        self.assertListEqual(
+            [
+                ("image", "https://google.de/images/test.png")
+            ],
+            extracted_image
+        )
+    def test_multiple_images(self):
+        text = "This is an ![image](https://google.de/images/test.png), this is also ![an Image](https://www.google.de/asdf/abc.png)"
+        extracted_image = extract_markdown_images(text)
+        self.assertListEqual(
+            [
+                ("image", "https://google.de/images/test.png"),
+                ("an Image", "https://www.google.de/asdf/abc.png")
+            ],
+            extracted_image
+        )
 
+    def test_link_as_image(self):
+        text = "test [link](https://google.de) should return nothing"
+        extracted_image = extract_markdown_images(text)
+        assert extracted_image == []
+
+    def test_single_link(self):
+        text = "test [link](https://google.de/asdf/abc)"
+        extracted_link = extract_markdown_links(text)
+        assert extracted_link == [("link", "https://google.de/asdf/abc")]
+    def test_multiple_links(self):
+        text = "this has [multiple](www.google.de) [links](http://reddit.com/programmerhumor)"
+        extracted_links = extract_markdown_links(text)
+        self.assertListEqual(
+            [("multiple", "www.google.de"),("links","http://reddit.com/programmerhumor")], extracted_links
+        )
 if __name__ == "__main__":
     unittest.main()

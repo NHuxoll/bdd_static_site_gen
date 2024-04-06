@@ -27,12 +27,22 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
     return new_nodes
 
 def extract_markdown_images(text):
-    alt_and_image = r"\!\[\w+\]\(\w+\:\//(\w+.)+.png\)"
+    image_list = []
+    alt_and_image = r'!\[\s?\w+\s?\w+?\]\(\S+\.png\)'
     extracted_images = re.findall(alt_and_image, text)
-
+    for image in extracted_images:
+        alt = re.search(r"\!\[\s?\w+\s?\w+?\]", image).group(0)[2:-1]
+        image_link = re.search(r"\(\w+\:\/\/(\w+.)+.png\)", image).group(0)[1:-1]
+        image_list.append((alt, image_link))
+    return image_list
 
 def extract_markdown_links(text):
-    alt_and_link = r"\[\w+\]\(\w+\:\//(\w+.)+\)"
+    link_list = []
+    alt_and_link = r"\[\s?\w+\s?\w+?\]\(\S+\)"
     extracted_links = re.findall(alt_and_link, text)
-
+    for links in extracted_links:
+        alt = re.search(r"\[\s?\w+\s?\w+?\]", links).group(0)[1:-1]
+        link = re.search(r"\(\w+\:?\/?/?(\w+.)+\)", links).group(0)[1:-1]
+        link_list.append((alt, link))
+    return link_list
 
