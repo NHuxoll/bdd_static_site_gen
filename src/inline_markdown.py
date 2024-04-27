@@ -85,10 +85,20 @@ def extract_markdown_images(text):
 
 def extract_markdown_links(text):
     link_list = []
-    alt_and_link = r"\[\s?\w+\s?\w+?\]\(\S+\)"
+    alt_and_link = r"[^!]\[\s?\w+\s?\w+?\]\(\S+\)"
     extracted_links = re.findall(alt_and_link, text)
     for links in extracted_links:
         alt = re.search(r"\[\s?\w+\s?\w+?\]", links).group(0)[1:-1]
         link = re.search(r"\(\w+\:?\/?/?(\w+.)+\)", links).group(0)[1:-1]
         link_list.append((alt, link))
     return link_list
+
+
+def text_to_textnodes(text):
+    nodes_list = [TextNode(text, text_type_text)]
+    nodes_list = split_nodes_links(nodes_list)
+    nodes_list = split_nodes_images(nodes_list)
+    nodes_list = split_nodes_delimiter(nodes_list, "**", text_type_bold)
+    nodes_list = split_nodes_delimiter(nodes_list, "*", text_type_italic)
+    nodes_list = split_nodes_delimiter(nodes_list, "`", text_type_code)
+    return nodes_list
