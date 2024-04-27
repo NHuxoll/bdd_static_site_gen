@@ -136,12 +136,24 @@ class TestInlineMarkdown(unittest.TestCase):
         )
 
     def test_multiple_images(self):
-        text = "This is an ![image](https://google.de/images/test.png), this is also ![an Image](https://www.google.de/asdf/abc.png)"
+        text = (
+            "This is text with an ![image](https://storage.googleapis.com/"
+            + "qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and "
+            + "another ![second image](https://storage.googleapis.com/"
+            + "qvault-webapp-dynamic-assets/course_assets/3elNhQu.png)"
+        )
+
         extracted_image = extract_markdown_images(text)
         self.assertListEqual(
             [
-                ("image", "https://google.de/images/test.png"),
-                ("an Image", "https://www.google.de/asdf/abc.png"),
+                (
+                    "image",
+                    "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png",
+                ),
+                (
+                    "second image",
+                    "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu.png",
+                ),
             ],
             extracted_image,
         )
@@ -157,12 +169,23 @@ class TestInlineMarkdown(unittest.TestCase):
         assert extracted_link == [("link", "https://google.de/asdf/abc")]
 
     def test_multiple_links(self):
-        text = "this has [multiple](www.google.de) [links](http://reddit.com/programmerhumor)"
+        text = (
+            "This is text with an [link](https://storage.googleapis.com/"
+            + "qvault-webapp-dynamic-assets/course_assets/zjjcJKZ) and a "
+            + "[second link](https://storage.googleapis.com"
+            + "/qvault-webapp-dynamic-assets/course_assets/3elNhQu)"
+        )
         extracted_links = extract_markdown_links(text)
         self.assertListEqual(
             [
-                ("multiple", "www.google.de"),
-                ("links", "http://reddit.com/programmerhumor"),
+                (
+                    "link",
+                    "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ",
+                ),
+                (
+                    "second link",
+                    "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu",
+                ),
             ],
             extracted_links,
         )
@@ -172,7 +195,7 @@ class TestInlineMarkdown(unittest.TestCase):
             "This is text with an [link](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ) and a [second link](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu)",
             text_type_text,
         )
-        extracted_nodes = split_nodes_images([node])
+        extracted_nodes = split_nodes_links([node])
         self.assertListEqual(
             [
                 TextNode("This is text with an ", text_type_text),
@@ -181,7 +204,7 @@ class TestInlineMarkdown(unittest.TestCase):
                     text_type_link,
                     "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ",
                 ),
-                TextNode(" and ", text_type_text),
+                TextNode(" and a ", text_type_text),
                 TextNode(
                     "second link",
                     text_type_link,
@@ -193,7 +216,7 @@ class TestInlineMarkdown(unittest.TestCase):
 
     def test_image_node(self):
         node = TextNode(
-            "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and another ![second image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu.png)",
+            "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and another ![second image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu.png) for testing purpose",
             text_type_text,
         )
         extracted_nodes = split_nodes_images([node])
@@ -211,6 +234,7 @@ class TestInlineMarkdown(unittest.TestCase):
                     text_type_image,
                     "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu.png",
                 ),
+                TextNode(" for testing purpose", text_type_text),
             ],
             extracted_nodes,
         )
