@@ -168,7 +168,28 @@ class TestInlineMarkdown(unittest.TestCase):
         )
 
     def test_link_node(self):
-        pass
+        node = TextNode(
+            "This is text with an [link](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ) and a [second link](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu)",
+            text_type_text,
+        )
+        extracted_nodes = split_nodes_images([node])
+        self.assertListEqual(
+            [
+                TextNode("This is text with an ", text_type_text),
+                TextNode(
+                    "link",
+                    text_type_link,
+                    "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ",
+                ),
+                TextNode(" and ", text_type_text),
+                TextNode(
+                    "second link",
+                    text_type_link,
+                    "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu",
+                ),
+            ],
+            extracted_nodes,
+        )
 
     def test_image_node(self):
         node = TextNode(

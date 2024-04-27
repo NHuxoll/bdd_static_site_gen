@@ -1,4 +1,5 @@
 import re
+
 from textnode import (
     TextNode,
     text_type_text,
@@ -31,47 +32,41 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
     return new_nodes
 
 
-def split_nodes_links(old_nodes):
+def split_nodes_images(old_nodes):
     new_nodes = []
-    for old_node in old_nodes:
-        if old_node.text_type != text_type_text:
-            new_nodes.append(old_node)
-            continue
-        split_nodes = []
-        selections = old_node.text.split(r"\[\s?\w+\s?\w+?\]\(\S+\)")
-        if len(selections) % 2 != 0:
-            raise ValueError("Invalid markdown, formatted section not closed")
-        for index, split_node in enumerate(selections):
-            if split_node == "":
-                continue
-            if index % 2 == 0:
-                alt_text, link = extract_markdown_links(split_node)
-                split_nodes.append(TextNode(alt_text, text_type_link, link))
-            else:
-                split_nodes.append(TextNode(split_node, text_type_text))
-        new_nodes.extend(split_nodes)
+    for node in old_nodes:
+        images = extract_markdown_images(node.text)
+        if not images:
+            new_nodes.append(node)
+        else:
+            for image in images:
+                split = node.text.split(f"![{image[0]}]({image[1]})", 1)
+                node.text = split[1]
+                if not split or split[0] == "":
+                    continue
+                else:
+                    new_nodes.append(TextNode(split[0], text_type_text, None))
+                    new_nodes.append(TextNode(image[0], text_type_image, image[1]))
     return new_nodes
 
 
-def split_nodes_images(old_nodes):
+def split_nodes_links(old_nodes):
     new_nodes = []
-    for old_node in old_nodes:
-        if old_node.text_type != text_type_text:
-            new_nodes.append(old_node)
-            continue
-        split_nodes = []
-        selections = old_node.text.split(r"!\[\s?\w+\s?\w+?\]\(\S+\.png\)")
-        # if len(selections) % 2 != 0:
-        #     raise ValueError("Invalid markdown, formatted section not closed")
-        for index, split_node in enumerate(selections):
-            if split_node == "":
-                continue
-            if index % 2 == 0:
-                alt_text, link = extract_markdown_links(split_node)[0]
-                split_nodes.append(TextNode(alt_text, text_type_image, link))
-            else:
-                split_nodes.append(TextNode(split_node, text_type_text))
-        new_nodes.extend(split_nodes)
+    for node in old_nodes:
+        links = extract_markdown_links(node.text)
+        print(f"links: {links}")
+        if not links:
+            new_nodes.append(node)
+        else:
+            for link in links:
+                split = node.text.split(f"[{link[0]}]({link[1]})", 1)
+                print(split)
+                node.text = split[1]
+                if not split or split[0] == "":
+                    continue
+                else:
+                    new_nodes.append(TextNode(split[0], text_type_text, None))
+                    new_nodes.append(TextNode(link[0], text_type_link, link[1]))
     return new_nodes
 
 
