@@ -1,16 +1,5 @@
-from typing import List, Dict
-
-
 class HTMLNode:
-
-    def __init__(
-        self,
-        tag: str | None = None,
-        value: str | None = None,
-        children: List | None = None,
-        props: Dict[str, str] | None = None,
-    ):
-
+    def __init__(self, tag=None, value=None, children=None, props=None):
         self.tag = tag
         self.value = value
         self.children = children
@@ -32,27 +21,23 @@ class HTMLNode:
 
 
 class LeafNode(HTMLNode):
-    def __init__(self, tag, value, props: Dict[str, str] | None = None):
-        if not value:
-            raise ValueError("All leaf nodes require a value")
-
-        super().__init__(tag=tag, value=value, children=None, props=props)
+    def __init__(self, tag, value, props=None):
+        super().__init__(tag, value, None, props)
 
     def to_html(self):
+        if self.value is None:
+            raise ValueError("Invalid HTML: no value")
         if self.tag is None:
             return self.value
-        elif self.value is None:
-            raise ValueError("Invalid HTML: no value")
-        else:
-            return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
+        return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
 
     def __repr__(self):
         return f"LeafNode({self.tag}, {self.value}, {self.props})"
 
 
 class ParentNode(HTMLNode):
-    def __init__(self, tag, children, props: Dict[str, str] | None = None):
-        super().__init__(tag=tag, value=None, children=children, props=props)
+    def __init__(self, tag, children, props=None):
+        super().__init__(tag, None, children, props)
 
     def to_html(self):
         if self.tag is None:
@@ -65,4 +50,5 @@ class ParentNode(HTMLNode):
         return f"<{self.tag}{self.props_to_html()}>{children_html}</{self.tag}>"
 
     def __repr__(self):
-        return f"ParentNode({self.tag}, children:{self.children}, {self.props})"
+        return f"ParentNode({self.tag}, children: {self.children}, {self.props})"
+
