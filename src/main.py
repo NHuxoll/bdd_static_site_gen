@@ -1,5 +1,8 @@
+import os
+import shutil
 from textnode import TextNode
 
-a = TextNode("this is a text node", "bold", "https://www.boot.dev")
+def copy_static() -> None:
 
-print(a)
+    #shutil.rmtree()
+    pass
